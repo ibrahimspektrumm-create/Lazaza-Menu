@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>إدارة المطعم</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ===== Login screen ===== -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-card">
+    <h1>لوحة إدارة المطعم</h1>
+    <p class="login-sub">سجّل الدخول لإدارة المنيو والمنتجات</p>
+    <form id="loginForm">
+      <label>اسم المستخدم</label>
+      <input type="text" id="loginUsername" required autocomplete="username">
+      <label>كلمة المرور</label>
+      <input type="password" id="loginPassword" required autocomplete="current-password">
+      <button type="submit" class="btn btn--primary btn--block">تسجيل الدخول</button>
+      <p class="login-error" id="loginError" hidden></p>
+    </form>
+  </div>
+</div>
+
+<!-- ===== Kicked-out overlay (another device logged in) ===== -->
+<div class="kicked-screen" id="kickedScreen" hidden>
+  <div class="login-card">
+    <h1>تم تسجيل الخروج</h1>
+    <p class="login-sub">تم تسجيل الدخول لهذا الحساب من جهاز آخر، فتم إنهاء هذه الجلسة تلقائيًا لحماية الحساب.</p>
+    <button class="btn btn--primary btn--block" onclick="location.reload()">تسجيل الدخول من جديد</button>
+  </div>
+</div>
+
+<!-- ===== First-run: set recovery code ===== -->
+<div class="modal-backdrop" id="setupBackdrop">
+  <div class="modal">
+    <div class="modal__head"><h3>إعداد أولي: رمز تغيير كلمة المرور</h3></div>
+    <form id="setupForm" class="settings-form modal__body">
+      <p style="color:var(--c-ink-soft);font-size:.85rem;margin-top:0;">
+        حدّد رمزًا سريًا هيتطلب إدخاله لاحقًا عند تغيير كلمة مرور الحساب. احتفظ بيه في مكان آمن، مش هيظهر في أي مكان في الموقع بعد كده.
+      </p>
+      <label>الرمز السري</label>
+      <input type="text" id="setupCode" required minlength="3">
+      <label>تأكيد الرمز</label>
+      <input type="text" id="setupCodeConfirm" required minlength="3">
+      <button type="submit" class="btn btn--primary btn--block">حفظ الرمز والمتابعة</button>
+      <p class="login-error" id="setupError" hidden></p>
+    </form>
+  </div>
+</div>
+
+<!-- ===== Dashboard ===== -->
+<div class="app" id="app" hidden>
+  <header class="topbar">
+    <div class="topbar__title">لوحة الإدارة</div>
+    <button class="btn btn--ghost" id="logoutBtn">خروج</button>
+  </header>
+
+  <main class="content" id="content">
+
+    <!-- Products tab -->
+    <section class="tab-panel" id="tab-products">
+      <div class="panel-head">
+        <h2>المنتجات</h2>
+        <button class="btn btn--primary" id="addProductBtn">+ إضافة منتج</button>
+      </div>
+      <div class="filter-row">
+        <select id="filterCategory"><option value="all">كل الأقسام</option></select>
+      </div>
+      <div id="productList" class="product-list"></div>
+    </section>
+
+    <!-- Categories tab -->
+    <section class="tab-panel" id="tab-categories" hidden>
+      <div class="panel-head"><h2>الأقسام</h2></div>
+      <form id="addCategoryForm" class="inline-form">
+        <input type="text" id="newCategoryName" placeholder="اسم قسم جديد" required>
+        <button class="btn btn--primary" type="submit">إضافة</button>
+      </form>
+      <div id="categoryList" class="category-list"></div>
+    </section>
+
+    <!-- Restaurant info tab -->
+    <section class="tab-panel" id="tab-info" hidden>
+      <div class="panel-head"><h2>بيانات المطعم</h2></div>
+      <form id="infoForm" class="settings-form">
+        <label>اسم المطعم</label>
+        <input type="text" id="infName" required>
+
+        <label>وصف قصير</label>
+        <textarea id="infDesc" rows="2"></textarea>
+
+        <label>Logo</label>
+        <div class="img-picker" id="logoPicker">
+          <img id="logoPreview" hidden>
+          <span class="img-picker__label">اضغط لاختيار صورة</span>
+          <input type="file" accept="image/*" id="logoInput" hidden>
+        </div>
+
+        <label>صورة / Banner رئيسي</label>
+        <div class="img-picker" id="bannerPicker">
+          <img id="bannerPreview" hidden>
+          <span class="img-picker__label">اضغط لاختيار صورة</span>
+          <input type="file" accept="image/*" id="bannerInput" hidden>
+        </div>
+
+        <label>العنوان</label>
+        <input type="text" id="infAddress">
+        <label class="checkbox-row"><input type="checkbox" id="infShowAddress"> إظهار العنوان</label>
+
+        <label>رابط Google Maps</label>
+        <input type="url" id="infMaps" placeholder="https://maps.google.com/...">
+
+        <label>أوقات العمل</label>
+        <input type="text" id="infHours" placeholder="يوميًا من 12 ظهرًا حتى 1 صباحًا">
+
+        <label>اللون الأساسي</label>
+        <input type="color" id="infPrimaryColor" value="#0E4F5C">
+
+        <label>لون التمييز (Accent)</label>
+        <input type="color" id="infAccentColor" value="#C9A15A">
+
+        <label style="margin-top:20px;">أرقام التواصل والحسابات</label>
+        <div id="contactList" class="contact-list"></div>
+        <button type="button" class="btn btn--ghost" id="addContactBtn" style="margin-top:8px;">+ إضافة رقم / حساب</button>
+
+        <button type="submit" class="btn btn--primary btn--block">حفظ البيانات</button>
+        <p class="save-msg" id="infoSaveMsg" hidden>تم الحفظ ✓</p>
+      </form>
+    </section>
+
+    <!-- QR tab -->
+    <section class="tab-panel" id="tab-qr" hidden>
+      <div class="panel-head"><h2>QR Code الخاص بالمنيو</h2></div>
+      <div class="qr-card">
+        <canvas id="qrCanvas" width="320" height="380"></canvas>
+        <div id="qrCodeBox" hidden></div>
+        <p class="qr-url" id="qrUrlText"></p>
+        <div class="qr-actions">
+          <button class="btn btn--primary" id="qrDownloadBtn">تحميل QR</button>
+          <button class="btn btn--ghost" id="qrPrintBtn">طباعة</button>
+          <button class="btn btn--ghost" id="qrCopyBtn">نسخ الرابط</button>
+        </div>
+        <p class="qr-hint">أي تعديل على المنتجات أو الأسعار يظهر تلقائيًا بنفس الرابط دون الحاجة لطباعة QR جديد.</p>
+      </div>
+    </section>
+
+    <!-- Security tab -->
+    <section class="tab-panel" id="tab-security" hidden>
+      <div class="panel-head"><h2>الأمان</h2></div>
+      <form id="passwordForm" class="settings-form">
+        <label>كلمة المرور الحالية</label>
+        <input type="password" id="secCurrentPassword" required autocomplete="current-password">
+        <label>كلمة المرور الجديدة</label>
+        <input type="password" id="secNewPassword" required minlength="6" autocomplete="new-password">
+        <label>تأكيد كلمة المرور الجديدة</label>
+        <input type="password" id="secNewPasswordConfirm" required minlength="6" autocomplete="new-password">
+        <label>الرمز السري لتغيير كلمة المرور</label>
+        <input type="text" id="secRecoveryCode" required>
+        <button type="submit" class="btn btn--primary btn--block">تغيير كلمة المرور</button>
+        <p class="save-msg" id="secSaveMsg" hidden>تم تغيير كلمة المرور ✓</p>
+        <p class="login-error" id="secError" hidden></p>
+      </form>
+    </section>
+  </main>
+
+  <nav class="bottom-nav" id="bottomNav">
+    <button class="nav-btn active" data-tab="products"><span>🍽️</span>منتجات</button>
+    <button class="nav-btn" data-tab="categories"><span>📂</span>أقسام</button>
+    <button class="nav-btn" data-tab="info"><span>🏠</span>المطعم</button>
+    <button class="nav-btn" data-tab="qr"><span>🔗</span>QR</button>
+    <button class="nav-btn" data-tab="security"><span>🔒</span>الأمان</button>
+  </nav>
+</div>
+
+<!-- ===== Product edit modal ===== -->
+<div class="modal-backdrop" id="productModalBackdrop">
+  <div class="modal">
+    <div class="modal__head">
+      <h3 id="productModalTitle">إضافة منتج</h3>
+      <button class="modal__close" id="productModalClose">✕</button>
+    </div>
+    <form id="productForm" class="settings-form modal__body">
+      <label>القسم</label>
+      <select id="pCategory" required></select>
+
+      <label>اسم المنتج</label>
+      <input type="text" id="pName" required>
+
+      <label>صورة المنتج</label>
+      <div class="img-picker" id="productImgPicker">
+        <img id="productImgPreview" hidden>
+        <span class="img-picker__label">اضغط لاختيار صورة</span>
+        <input type="file" accept="image/*" id="productImgInput" hidden>
+      </div>
+
+      <label>وصف قصير</label>
+      <textarea id="pDesc" rows="2"></textarea>
+
+      <label>المكونات</label>
+      <textarea id="pIngredients" rows="2"></textarea>
+
+      <label>ملاحظات إضافية</label>
+      <input type="text" id="pNotes">
+
+      <label>السعر الأصلي</label>
+      <input type="number" id="pPrice" min="0" step="0.5" required>
+
+      <label class="checkbox-row"><input type="checkbox" id="pHasDiscount"> تفعيل خصم</label>
+      <div id="discountRow" hidden>
+        <label>سعر الخصم</label>
+        <input type="number" id="pDiscountPrice" min="0" step="0.5">
+      </div>
+
+      <label>الحالة</label>
+      <select id="pAvailable">
+        <option value="true">متاح</option>
+        <option value="false">غير متاح</option>
+      </select>
+
+      <label>Badges</label>
+      <div class="badge-checks">
+        <label><input type="checkbox" value="popular" class="pBadge"> الأكثر طلبًا</label>
+        <label><input type="checkbox" value="new" class="pBadge"> جديد</label>
+        <label><input type="checkbox" value="featured" class="pBadge"> مميز</label>
+      </div>
+
+      <label class="checkbox-row"><input type="checkbox" id="pHidden"> إخفاء المنتج مؤقتًا (لن يظهر للعملاء)</label>
+
+      <div class="modal__actions">
+        <button type="button" class="btn btn--danger" id="deleteProductBtn" hidden>حذف</button>
+        <button type="submit" class="btn btn--primary btn--block">حفظ المنتج</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module" src="app.js"></script>
+</body>
+</html>

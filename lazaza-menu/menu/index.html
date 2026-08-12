@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title id="pageTitle">المنيو</title>
+<meta id="metaDesc" name="description" content="منيو المطعم الرقمي - أسماك ومأكولات بحرية طازجة">
+<meta property="og:type" content="website">
+<meta id="ogTitle" property="og:title" content="المنيو">
+<meta id="ogDesc" property="og:description" content="أسماك ومأكولات بحرية طازجة">
+<meta id="ogImage" property="og:image" content="">
+<link rel="icon" id="favicon" href="">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=Aref+Ruqaa:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Loading state -->
+  <div id="loadingScreen" class="loading-screen">
+    <div class="wave-spinner"><span></span><span></span><span></span></div>
+  </div>
+
+  <header class="hero" id="hero">
+    <div class="hero__media">
+      <img id="bannerImg" src="" alt="" class="hero__banner">
+      <div class="hero__overlay"></div>
+    </div>
+    <div class="hero__content">
+      <img id="logoImg" src="" alt="" class="hero__logo" hidden>
+      <h1 class="hero__name" id="restName">اسم المطعم</h1>
+      <p class="hero__desc" id="restDesc">وصف قصير عن المطعم</p>
+    </div>
+    <svg class="hero__wave" viewBox="0 0 1440 60" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M0,32 C240,64 480,0 720,20 C960,40 1200,64 1440,28 L1440,60 L0,60 Z"></path>
+    </svg>
+  </header>
+
+  <nav class="tabs" id="tabsBar" aria-label="أقسام المنيو">
+    <div class="tabs__scroll" id="tabsScroll"></div>
+  </nav>
+
+  <main class="menu" id="menuList"></main>
+
+  <div class="empty-state" id="emptyState" hidden>
+    <p>لا توجد أصناف متاحة حاليًا في هذا القسم</p>
+  </div>
+
+  <footer class="site-footer" id="siteFooter">
+    <div class="footer__grid">
+      <div class="footer__hours" id="footerHours"></div>
+      <div class="footer__contact" id="footerContact"></div>
+    </div>
+    <a class="footer__maps" id="footerMaps" href="#" target="_blank" rel="noopener" hidden>📍 الموقع على الخريطة</a>
+    <p class="footer__note">القائمة تُحدَّث تلقائيًا من إدارة المطعم</p>
+  </footer>
+
+  <!-- Product detail sheet -->
+  <div class="sheet-backdrop" id="sheetBackdrop">
+    <div class="sheet" id="productSheet" role="dialog" aria-modal="true">
+      <button class="sheet__close" id="sheetClose" aria-label="إغلاق">✕</button>
+      <div class="sheet__imgwrap"><img id="sheetImg" src="" alt=""></div>
+      <div class="sheet__body">
+        <div class="sheet__badges" id="sheetBadges"></div>
+        <h2 id="sheetName"></h2>
+        <p class="sheet__desc" id="sheetDesc"></p>
+        <p class="sheet__ingredients" id="sheetIngredients"></p>
+        <p class="sheet__notes" id="sheetNotes"></p>
+        <div class="sheet__price" id="sheetPrice"></div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
